@@ -1,13 +1,11 @@
 import React, { Component } from 'react';
 import propTypes from 'prop-types';
 import axios from 'axios';
-import nth from 'ramda/src/nth';
 
 import Image from '../Image/Image';
 import slices from '../../utils/slices';
 // import noop from '../../utils/noop';
 
-// TODO: handle pagination+
 class Gallery extends Component {
   getGallery = (page = 0) =>
     axios.get(`https://api.imgur.com/3/gallery/r/${this.props.subreddit}/time/${Math.floor(page / 10)}`, {
@@ -33,6 +31,7 @@ class Gallery extends Component {
     });
   }
 
+  // TODO: refactor handle pagination to reduce duplicate code
   handlePagination = (page) => {
     let { cache } = this.state;
     if (!cache[page]) {
@@ -59,9 +58,9 @@ class Gallery extends Component {
     const { loading, photos, page } = this.state;
     return (
       <div>
-        <div>
+        <div style={{ display: 'flex', flexWrap: 'wrap' }}>
           {loading && <div>Loading...</div>}{' '}
-          {photos.length > 0 && photos.map(photo => <Image key={photo.id} src={photo.link} />)}
+          {photos.length > 0 && photos.map(photo => <Image {...this.props} key={photo.id} src={photo.link} />)}
         </div>
         <div>
           <button onClick={() => handlePagination(page - 1)} disabled={page < 1}>
