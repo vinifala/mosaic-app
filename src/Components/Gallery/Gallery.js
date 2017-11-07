@@ -19,6 +19,7 @@ class Gallery extends Component {
       photos: [],
       page: 0,
       cache: [],
+      timestamp: new Date().getTime(),
     };
 
     this.getGallery(this.state.page).then((data) => {
@@ -60,7 +61,10 @@ class Gallery extends Component {
       <div>
         <div style={{ display: 'flex', flexWrap: 'wrap' }}>
           {loading && <div>Loading...</div>}{' '}
-          {photos.length > 0 && photos.map(photo => <Image {...this.props} key={photo.id} src={photo.link} />)}
+          {photos.length > 0 &&
+            photos.map(photo => (
+              <Image {...this.props} key={photo.id} src={`${photo.link}?t=${this.state.timestamp}`} />
+            ))}
         </div>
         <div>
           <button onClick={() => handlePagination(page - 1)} disabled={page < 1}>

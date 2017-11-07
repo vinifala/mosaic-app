@@ -29,7 +29,9 @@ class Image extends Component {
           }}
           alt="test"
           onLoad={this.handleImageLoad}
+          /* need to disable caching to avoid CORS error `${this.props.src}?${new Date().getTime()}` */
           src={this.props.src}
+          crossOrigin="anoniyous"
           style={{
             width: '100%',
             display: this.state.loading ? 'none' : 'block',

@@ -15,7 +15,8 @@
     "no-console": 0,
     "max-len": [2, { "code": 120 }],
     "react/no-unused-prop-types": 0,
-    "react/sort-comp": 0
+    "react/sort-comp": 0,
+    "no-bitwise": 0
   },
   "globals": {
     "document": true,

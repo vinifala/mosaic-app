@@ -5,11 +5,14 @@
   "private": true,
   "dependencies": {
     "axios": "^0.17.0",
+    "body-parser": "^1.18.2",
+    "express": "^4.16.2",
     "prop-types": "^15.6.0",
     "ramda": "^0.25.0",
     "react": "^16.0.0",
     "react-dom": "^16.0.0",
-    "react-scripts": "1.0.17"
+    "react-scripts": "1.0.17",
+    "supervisor": "^0.12.0"
   },
   "scripts": {
     "start": "react-scripts start",
