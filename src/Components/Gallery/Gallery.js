@@ -4,13 +4,9 @@ import axios from 'axios';
 
 import Image from '../Image/Image';
 import slices from '../../utils/slices';
-// import noop from '../../utils/noop';
 
 class Gallery extends Component {
   getGallery = (page = 0) =>
-    // axios.get(`https://api.imgur.com/3/gallery/r/${this.props.subreddit}/time/${Math.floor(page / 10)}`, {
-    //   headers: { Authorization: 'Client-ID c25046dfd5c4b8e' },
-    // });
     axios.get(`http://localhost:3001/gallery/${this.props.subreddit}/${Math.floor(page / 10)}`);
 
   constructor(props) {
@@ -33,7 +29,8 @@ class Gallery extends Component {
     });
   }
 
-  // TODO: refactor handle pagination to reduce duplicate code
+  // TODO: handle pagination calculation on the server
+  // TODO: add catch
   handlePagination = (page) => {
     let { cache } = this.state;
     if (!cache[page]) {
@@ -64,6 +61,13 @@ class Gallery extends Component {
           {loading && <div>Loading...</div>}{' '}
           {photos.length > 0 &&
             photos.map(photo => (
+              /*
+                Loading the image from browser cache onto the canvas causes the canvas to be tainted:
+                `Failed to execute 'getImageData' on 'CanvasRenderingContext2D':
+                The canvas has been tainted by cross-origin data`
+                including a timestamp as a query string when requesting the image forces the browser
+                to download the image every time.
+              */
               <Image {...this.props} key={photo.id} src={`${photo.link}?t=${this.state.timestamp}`} />
             ))}
         </div>

@@ -19,6 +19,7 @@ class FileUpload extends Component {
 
     this.state = {
       uploading: false,
+      errorMessage: '',
       img: '',
     };
   }
@@ -30,23 +31,30 @@ class FileUpload extends Component {
           disabled={this.state.uploading}
           type="file"
           onChange={(e) => {
-            console.log(e, e.target.value, e.target.files);
-            this.setState({ uploading: true });
+            this.setState({ uploading: true, errorMessage: '' });
             getBase64(e.target.files[0]).then(encodedImage =>
               axios({
                 method: 'POST',
                 url: 'http://localhost:3001/upload-image',
                 data: { image: encodedImage },
               })
-                .catch(console.log)
-                // .then(({ data }) => this.setState({ link: data.data.link })),
-                // TODO: create img element for uploaded image
+                .catch(() =>
+                  this.setState({
+                    uploading: false,
+                    errorMessage:
+                      'Oops, something went wrong while trying to upload your image, please try again later.',
+                  }))
                 .then(({ data }) => {
-                  this.setState({ uploading: false, img: `${data.data.link}?t=${new Date().getTime()}` });
+                  this.setState({
+                    uploading: false,
+                    img: `${data.data.link}?t=${new Date().getTime()}`,
+                    errorMessage: '',
+                  });
                 }));
           }}
         />
         {this.state.uploading && <div>Sending image...</div>}
+        {this.state.errorMessage && <div>{this.state.errorMessage}</div>}
         {!this.state.uploading && this.state.img && <Image src={this.state.img} {...this.props} autoSelect />}
       </div>
     );

@@ -42,7 +42,6 @@ class Image extends Component {
               this.props.selectImage(this.domImage);
             }
           }}
-          /* need to disable caching to avoid CORS error `${this.props.src}?${new Date().getTime()}` */
           src={this.props.src}
           crossOrigin="anonymous"
           style={{
