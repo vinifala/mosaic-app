@@ -22,6 +22,7 @@
     "document": true,
     "window": true,
     "localStorage": true,
-    "sessionStorage": true
+    "sessionStorage": true,
+    "FileReader": true
   }
 }

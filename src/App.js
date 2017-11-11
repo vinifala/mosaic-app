@@ -3,6 +3,7 @@ import propTypes from 'prop-types';
 
 import Gallery from './Components/Gallery/Gallery';
 import Mosaic from './Components/Mosaic/Mosaic';
+import FileUpload from './Components/FileUpload/FileUpload';
 import slices from './utils/slices';
 import './App.css';
 
@@ -13,20 +14,26 @@ class App extends Component {
     this.state = {
       selectedImage: null,
       mosaicTiles: [],
+      status: 'ready',
     };
   }
 
   // TODO: refactor to a mosaic container
-  handleSelectImage = (image) => {
+  handleSelectImage = async (image) => {
+    // this.setState({});
+    console.log(this.state.status);
     const {
       mosaicWidth, mosaicHeight, tileWidth, tileHeight,
     } = this.props;
-    console.log('handleSelectImage', image);
-    this.setState({ selectedImage: image });
-    this.handleUpdateMosaic(image, mosaicWidth, mosaicHeight, tileWidth, tileHeight);
+    this.setState({ selectedImage: image, status: 'Calculating...' });
+    console.log(new Date().getTime());
+    console.log(this.state.status);
+    const mosaicTiles = await this.handleUpdateMosaic(image, mosaicWidth, mosaicHeight, tileWidth, tileHeight);
+    console.log(new Date().getTime());
+    this.setState({ mosaicTiles, status: 'done' });
   };
 
-  handleUpdateMosaic = (img, width, height, tileWidth, tileHeight) => {
+  handleUpdateMosaic = async (img, width, height, tileWidth, tileHeight) => {
     console.log('handleUpdateMosaic with', img);
     const getAverageColour = (pixels) => {
       const sum = pixels.reduce(
@@ -73,14 +80,15 @@ class App extends Component {
           w: tileWidth,
           h: tileHeight,
         });
-        this.setState({ mosaicTiles });
       }
     }
     canvas.remove();
+    return mosaicTiles;
+    // this.setState({ mosaicTiles, status: 'done' });
   };
 
   render() {
-    const { selectedImage } = this.state;
+    const { selectedImage, status, mosaicTiles } = this.state;
     const {
       mosaicWidth, mosaicHeight, tileWidth, tileHeight,
     } = this.props;
@@ -89,17 +97,22 @@ class App extends Component {
         <div>
           <Gallery selectImage={this.handleSelectImage} subreddit="earthporn" />
         </div>
+        <div>{status}</div>
+        {selectedImage && mosaicTiles.length < 1 && <div>Generating mosaic...</div>}
         <div>
-          {selectedImage && (
+          {
             <Mosaic
+              img={this.state.image}
               width={mosaicWidth}
               height={mosaicHeight}
               tileWidth={tileWidth}
               tileHeight={tileHeight}
               mosaicTiles={this.state.mosaicTiles}
-              img={selectedImage}
             />
-          )}
+          }
+        </div>
+        <div>
+          <FileUpload selectImage={this.handleSelectImage} />
         </div>
       </div>
     );

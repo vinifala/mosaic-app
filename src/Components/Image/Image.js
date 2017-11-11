@@ -19,8 +19,16 @@ class Image extends Component {
   render() {
     return (
       <button
+        disabled={this.state.loading}
         onClick={() => this.props.selectImage(this.domImage)}
-        style={{ width: '20%', height: '250px', overflow: 'hidden' }}
+        style={{
+          width: '10%',
+          height: '150px',
+          overflow: 'hidden',
+          border: 0,
+          padding: 0,
+          cursor: 'pointer',
+        }}
       >
         {this.state.loading && <div>Loading...</div>}
         <img
@@ -28,10 +36,15 @@ class Image extends Component {
             this.domImage = image;
           }}
           alt="test"
-          onLoad={this.handleImageLoad}
+          onLoad={() => {
+            this.handleImageLoad();
+            if (this.props.autoSelect) {
+              this.props.selectImage(this.domImage);
+            }
+          }}
           /* need to disable caching to avoid CORS error `${this.props.src}?${new Date().getTime()}` */
           src={this.props.src}
-          crossOrigin="anoniyous"
+          crossOrigin="anonymous"
           style={{
             width: '100%',
             display: this.state.loading ? 'none' : 'block',
@@ -48,10 +61,12 @@ export default Image;
 
 Image.defaultProps = {
   selectImage: noop,
+  autoSelect: false,
   src: '',
 };
 
 Image.propTypes = {
   selectImage: propTypes.func,
+  autoSelect: propTypes.bool,
   src: propTypes.string,
 };

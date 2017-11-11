@@ -8,9 +8,10 @@ import slices from '../../utils/slices';
 
 class Gallery extends Component {
   getGallery = (page = 0) =>
-    axios.get(`https://api.imgur.com/3/gallery/r/${this.props.subreddit}/time/${Math.floor(page / 10)}`, {
-      headers: { Authorization: 'Client-ID c25046dfd5c4b8e' },
-    });
+    // axios.get(`https://api.imgur.com/3/gallery/r/${this.props.subreddit}/time/${Math.floor(page / 10)}`, {
+    //   headers: { Authorization: 'Client-ID c25046dfd5c4b8e' },
+    // });
+    axios.get(`http://localhost:3001/gallery/${this.props.subreddit}/${Math.floor(page / 10)}`);
 
   constructor(props) {
     super(props);

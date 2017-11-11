@@ -6,6 +6,8 @@ const Mosaic = (props) => {
   console.log(1, props.mosaicTiles);
   return (
     <div>
+      {props.mosaicTiles.length < 1 && !props.img && <div>Please select or upload an image</div>}
+      {props.mosaicTiles.length < 1 && props.img && <div>Calculating...</div>}
       {props.mosaicTiles.length > 0 && (
         <svg width={props.width} height={props.height}>
           {props.mosaicTiles.map(tile => (
