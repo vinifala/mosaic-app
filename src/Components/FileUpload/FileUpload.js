@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import propTypes from 'prop-types';
 import axios from 'axios';
 
+import Alert from '../antd/Alert';
+import Spin from '../antd/Spin';
 import Image from '../Image/Image';
 import noop from '../../utils/noop';
 import toBase64 from '../../utils/toBase64';
@@ -49,8 +51,7 @@ class FileUpload extends Component {
                   .catch(() =>
                     this.setState({
                       uploading: false,
-                      errorMessage:
-                        'Oops, something went wrong while trying to upload your image, please try again later.',
+                      errorMessage: 'Oops, something went wrong while trying to upload your image, please try again.',
                       img: '',
                     }))
                   .then(({ data }) => {
@@ -67,8 +68,16 @@ class FileUpload extends Component {
                 }));
           }}
         />
-        {this.state.uploading && <div>Sending image...</div>}
-        {this.state.errorMessage && <div>{this.state.errorMessage}</div>}
+        {this.state.uploading && (
+          <div>
+            <Spin tip="Sending image..." />
+          </div>
+        )}
+        {this.state.errorMessage && (
+          <div>
+            <Alert message={this.state.errorMessage} type="error" showIcon />
+          </div>
+        )}
         {!this.state.uploading && this.state.img && <Image src={this.state.img} {...this.props} autoSelect />}
       </div>
     );

@@ -1,7 +1,11 @@
 import React, { Component } from 'react';
 import propTypes from 'prop-types';
 import axios from 'axios';
+import Spin from 'antd/lib/spin';
+import 'antd/lib/spin/style/index.css';
 
+import Button from '../antd/Button';
+import Alert from '../antd/Alert';
 import Image from '../Image/Image';
 
 class Gallery extends Component {
@@ -54,14 +58,18 @@ class Gallery extends Component {
             flexWrap: 'wrap',
             alignContent: 'center',
             placeContent: 'center',
-            minHeight: '150px',
+            height: '150px',
           }}
         >
-          {loading && <div>Loading...</div>}
+          {loading && (
+            <div>
+              <Spin size="large" tip={this.state.statusMessage} />
+            </div>
+          )}
           {errorMessage && (
             <div>
-              {errorMessage}&nbsp;
-              <button onClick={() => this.getGallery(this.state.page)}>Retry</button>
+              <Alert message={errorMessage} type="error" showIcon />
+              <Button onClick={() => this.getGallery(this.state.page)}>Retry</Button>
             </div>
           )}
           {photos.length > 0 &&
@@ -80,11 +88,11 @@ class Gallery extends Component {
         {!loading &&
           !errorMessage && (
             <div>
-              <button onClick={() => handlePagination(page - 1)} disabled={page < 1}>
+              <Button onClick={() => handlePagination(page - 1)} disabled={page < 2}>
                 &lt; Previous
-              </button>
-              <span> {page} </span>
-              <button onClick={() => handlePagination(page + 1)}>Next &gt;</button>
+              </Button>
+              <span> Page {page} </span>
+              <Button onClick={() => handlePagination(page + 1)}>Next &gt;</Button>
             </div>
           )}
       </div>

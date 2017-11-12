@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import propTypes from 'prop-types';
+import LocaleProvider from 'antd/lib/locale-provider';
+import enUS from 'antd/lib/locale-provider/en_US';
 
 import Gallery from './Components/Gallery/Gallery';
 import Mosaic from './Components/Mosaic/Mosaic';
@@ -22,26 +24,28 @@ class App extends Component {
   render() {
     const { selectedImage, mosaicTiles } = this.state;
     return (
-      <div className="App">
-        <div>
-          <Gallery selectImage={this.handleSelectImage} subreddit="earthporn" />
+      <LocaleProvider locale={enUS}>
+        <div className="App">
+          <div>
+            <Gallery selectImage={this.handleSelectImage} subreddit="earthporn" />
+          </div>
+          <div>
+            <FileUpload selectImage={this.handleSelectImage} />
+          </div>
+          <div>
+            {
+              <Mosaic
+                img={selectedImage}
+                width={400}
+                height={400}
+                tileWidth={10}
+                tileHeight={10}
+                mosaicTiles={mosaicTiles}
+              />
+            }
+          </div>
         </div>
-        <div>
-          <FileUpload selectImage={this.handleSelectImage} />
-        </div>
-        <div>
-          {
-            <Mosaic
-              img={selectedImage}
-              width={400}
-              height={400}
-              tileWidth={10}
-              tileHeight={10}
-              mosaicTiles={mosaicTiles}
-            />
-          }
-        </div>
-      </div>
+      </LocaleProvider>
     );
   }
 }

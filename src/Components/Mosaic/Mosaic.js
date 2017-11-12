@@ -3,6 +3,9 @@ import propTypes from 'prop-types';
 import html2canvas from 'html2canvas';
 import axios from 'axios';
 
+import Alert from '../antd/Alert';
+import Spin from '../antd/Spin';
+import Button from '../antd/Button';
 import slices from '../../utils/slices';
 import toBase64 from '../../utils/toBase64';
 
@@ -67,6 +70,8 @@ class Mosaic extends Component {
       mosaicTiles: [],
       statusMessage: '',
       shareUrl: '',
+      sharing: false,
+      sharingError: '',
     };
   }
 
@@ -90,17 +95,41 @@ class Mosaic extends Component {
   }
 
   render() {
+    const { width, height } = this.props;
     return (
-      <div>
-        <div>{this.state.statusMessage}</div>
+      <div
+        style={{
+          width,
+          height,
+          margin: 'auto',
+        }}
+      >
+        {this.state.statusMessage && (
+          <div
+            style={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+            }}
+          >
+            <Spin size="large" tip={this.state.statusMessage} />
+          </div>
+        )}
         {this.state.mosaicTiles.length > 0 && (
           <div
-            style={{ width: this.props.width, height: this.props.height, margin: 'auto' }}
+            style={{
+              width,
+              height,
+              margin: 'auto',
+              position: 'relative',
+              opacity: this.state.statusMessage ? '0.2' : '1',
+            }}
             ref={(mosaicContainer) => {
               this.mosaicContainer = mosaicContainer;
             }}
           >
-            <svg width={this.props.width} height={this.props.height}>
+            <svg width={width} height={height}>
               {this.state.mosaicTiles.map(tile => (
                 <circle
                   key={`x${tile.x}y${tile.y}`}
@@ -115,20 +144,14 @@ class Mosaic extends Component {
         )}
         {this.state.mosaicTiles.length > 0 && (
           <div>
-            <button
+            <Button
+              disabled={this.state.sharing || this.state.statusMessage}
               onClick={() => {
-                // const { width, height } = this.props;
-                // const canvas = document.createElement('canvas');
-                // canvas.setAttribute('width', width);
-                // canvas.setAttribute('height', height);
-                // canvas.style.display = 'none';
-                // document.body.appendChild(canvas);
-                // const ctx = canvas.getContext('2d');
                 html2canvas(this.mosaicContainer, {
                   useCORS: true,
                   allowTaint: true,
-                  logging: true,
                 }).then((canvas) => {
+                  this.setState({ sharing: true, sharingError: '' });
                   canvas.style.display = 'none';
                   document.body.appendChild(canvas);
                   canvas.toBlob((blob) => {
@@ -137,19 +160,31 @@ class Mosaic extends Component {
                         method: 'POST',
                         url: 'http://localhost:3001/image',
                         data: { image: encodedImage },
-                      }).then(({ data }) => {
-                        this.setState({
-                          shareUrl: data.data.link,
-                        });
-                        canvas.remove();
-                      }).catch(() => canvas.remove()));
+                      })
+                        .then(({ data }) => {
+                          this.setState({
+                            shareUrl: data.data.link,
+                            sharing: false,
+                            sharingError: '',
+                          });
+                          canvas.remove();
+                        })
+                        .catch(() => {
+                          canvas.remove();
+                          this.setState({
+                            sharing: false,
+                            sharingError: 'Sorry, something went wrong while sharing, please try again',
+                          });
+                        }));
                   }, 'image/png');
                 });
               }}
             >
               Share on IMGUR
-            </button>
+            </Button>
             <div>
+              {this.state.sharingError && <Alert message={this.state.sharingError} type="error" showIcon />}
+              {this.state.sharing && <Spin tip="Sharing..." />}
               {this.state.shareUrl && (
                 <a href={this.state.shareUrl} target="_blank">
                   {this.state.shareUrl}

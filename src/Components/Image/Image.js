@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import propTypes from 'prop-types';
 
+import Spin from '../antd/Spin';
 import noop from '../../utils/noop';
 
 class Image extends Component {
@@ -39,7 +40,11 @@ class Image extends Component {
           cursor: !this.state.loading && !this.state.errorMessage ? 'pointer' : 'not-allowed',
         }}
       >
-        {this.state.loading && <span>Loading...</span>}
+        {this.state.loading && (
+          <span>
+            <Spin />
+          </span>
+        )}
         {this.state.errorMessage && <span>{this.state.errorMessage}</span>}
         {!this.state.errorMessage && (
           <img
