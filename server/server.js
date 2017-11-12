@@ -86,4 +86,4 @@ app.use(
   }),
 );
 
-app.listen(3001, () => console.log('Magic happenst on port 3001!'));
+app.listen(3001, () => console.log('Magic happenst at http://localhost:3001/'));
