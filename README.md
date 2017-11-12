@@ -3,7 +3,7 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 ### Running
 To run this project, clone the repo
 ```bash
-git clone https://github.com/vinifala/mosaic-app.git
+git clone https://github.com/vinifala/mosaic-app.git && cd mosaic-app
 ``` 
 
 ### Credentials
