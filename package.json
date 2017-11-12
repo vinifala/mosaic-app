@@ -8,8 +8,11 @@
     "axios": "^0.17.0",
     "body-parser": "^1.18.2",
     "dotenv": "^4.0.0",
+    "enzyme": "^3.1.1",
+    "enzyme-adapter-react-16": "^1.0.4",
     "express": "^4.16.2",
     "html2canvas": "^0.5.0-beta4",
+    "jest": "^21.2.1",
     "prop-types": "^15.6.0",
     "ramda": "^0.25.0",
     "react": "^16.0.0",
@@ -18,7 +21,9 @@
     "supervisor": "^0.12.0"
   },
   "scripts": {
+    "server": "supervisor server/server.js",
     "start": "yarn run build && node server/server.js",
+    "dev": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"

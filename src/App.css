@@ -1,3 +1,24 @@
 .App {
   text-align: center;
 }
+
+.mosaic__container {
+  margin: auto;
+}
+
+.mosaic__status-message {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.mosaic__stage {
+  margin: auto;
+  position: relative;
+  opacity: 1;
+}
+
+.mosaic--loading {
+  opacity: 0.2;
+}

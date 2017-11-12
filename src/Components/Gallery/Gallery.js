@@ -9,32 +9,35 @@ import Alert from '../antd/Alert';
 import Image from '../Image/Image';
 
 class Gallery extends Component {
-  getGallery = (page = 1) => {
-    this.setState({ loading: true, errorMessage: '' });
-    return axios
-      .get(`http://localhost:3001/gallery/${this.props.subreddit}/${page}`)
-      .then((data) => {
-        this.setState({
-          loading: false,
-          photos: data.data,
-          errorMessage: '',
-          page,
-        });
-      })
-      .catch(() => this.setState({ errorMessage: 'Oops, looks like something went wrong', loading: false }));
-  };
-
   constructor(props) {
     super(props);
+
     this.state = {
       loading: true,
       photos: [],
       page: 1,
-      // cache: [],
       timestamp: new Date().getTime(),
       errorMessage: '',
     };
   }
+
+  handleGalleryRetrieval = page => data =>
+    this.setState({
+      loading: false,
+      photos: data.data,
+      errorMessage: '',
+      page,
+    });
+
+  handleGalleryError = () => this.setState({ errorMessage: 'Oops, looks like something went wrong', loading: false });
+
+  getGallery = (page = 1) => {
+    this.setState({ loading: true, errorMessage: '' });
+    axios
+      .get(`http://localhost:3001/gallery/${this.props.subreddit}/${page}`)
+      .then(this.handleGalleryRetrieval(page))
+      .catch(this.handleGalleryError);
+  };
 
   componentDidMount() {
     this.getGallery(this.state.page);

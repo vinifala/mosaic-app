@@ -75,6 +75,48 @@ class Mosaic extends Component {
     };
   }
 
+  createImageFromMosaic = mosaicContainer =>
+    html2canvas(mosaicContainer, {
+      useCORS: true,
+      allowTaint: true,
+    });
+
+  handleShareImageOnImgur = () =>
+    this.createImageFromMosaic(this.mosaicContainer).then(this.handleCanvasCreatedFromMosaic);
+
+  handleSuccessfulUpload = ({ data }) =>
+    this.setState({
+      shareUrl: data.data.link,
+      sharing: false,
+      sharingError: '',
+    });
+
+  handleFailedUpload = () =>
+    this.setState({
+      sharing: false,
+      sharingError: 'Sorry, something went wrong while sharing, please try again',
+    });
+
+  uploadEncodedImage = encodedImage =>
+    axios({
+      method: 'POST',
+      url: 'http://localhost:3001/image',
+      data: { image: encodedImage },
+    })
+      .then(this.handleSuccessfulUpload)
+      .catch(this.handleFailedUpload);
+
+  handleCanvasCreatedFromMosaic = (canvas) => {
+    this.setState({ sharing: true, sharingError: '' });
+    canvas.style.display = 'none';
+    document.body.appendChild(canvas);
+    canvas.toBlob((blob) => {
+      toBase64(blob)
+        .then(this.uploadEncodedImage)
+        .then(() => canvas.remove());
+    }, 'image/png');
+  };
+
   componentWillReceiveProps({
     width, height, tileWidth, tileHeight, img,
   }) {
@@ -98,32 +140,23 @@ class Mosaic extends Component {
     const { width, height } = this.props;
     return (
       <div
+        className="mosaic__container"
         style={{
           width,
           height,
-          margin: 'auto',
         }}
       >
         {this.state.statusMessage && (
-          <div
-            style={{
-              position: 'absolute',
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-            }}
-          >
+          <div className="mosaic__status-message">
             <Spin size="large" tip={this.state.statusMessage} />
           </div>
         )}
         {this.state.mosaicTiles.length > 0 && (
           <div
+            className={`mosaic__stage${this.state.statusMessage ? ' mosaic--loading' : ''}`}
             style={{
               width,
               height,
-              margin: 'auto',
-              position: 'relative',
-              opacity: this.state.statusMessage ? '0.2' : '1',
             }}
             ref={(mosaicContainer) => {
               this.mosaicContainer = mosaicContainer;
@@ -144,42 +177,7 @@ class Mosaic extends Component {
         )}
         {this.state.mosaicTiles.length > 0 && (
           <div>
-            <Button
-              disabled={this.state.sharing || this.state.statusMessage}
-              onClick={() => {
-                html2canvas(this.mosaicContainer, {
-                  useCORS: true,
-                  allowTaint: true,
-                }).then((canvas) => {
-                  this.setState({ sharing: true, sharingError: '' });
-                  canvas.style.display = 'none';
-                  document.body.appendChild(canvas);
-                  canvas.toBlob((blob) => {
-                    toBase64(blob).then(encodedImage =>
-                      axios({
-                        method: 'POST',
-                        url: 'http://localhost:3001/image',
-                        data: { image: encodedImage },
-                      })
-                        .then(({ data }) => {
-                          this.setState({
-                            shareUrl: data.data.link,
-                            sharing: false,
-                            sharingError: '',
-                          });
-                          canvas.remove();
-                        })
-                        .catch(() => {
-                          canvas.remove();
-                          this.setState({
-                            sharing: false,
-                            sharingError: 'Sorry, something went wrong while sharing, please try again',
-                          });
-                        }));
-                  }, 'image/png');
-                });
-              }}
-            >
+            <Button disabled={this.state.sharing || this.state.statusMessage} onClick={this.handleShareImageOnImgur}>
               Share on IMGUR
             </Button>
             <div>
