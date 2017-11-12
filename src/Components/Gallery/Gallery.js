@@ -3,63 +3,69 @@ import propTypes from 'prop-types';
 import axios from 'axios';
 
 import Image from '../Image/Image';
-import slices from '../../utils/slices';
 
 class Gallery extends Component {
-  getGallery = (page = 0) =>
-    axios.get(`http://localhost:3001/gallery/${this.props.subreddit}/${Math.floor(page / 10)}`);
+  getGallery = (page = 1) => {
+    this.setState({ loading: true, errorMessage: '' });
+    return axios
+      .get(`http://localhost:3001/gallery/${this.props.subreddit}/${page}`)
+      .then((data) => {
+        this.setState({
+          loading: false,
+          photos: data.data,
+          errorMessage: '',
+          page,
+        });
+      })
+      .catch(() => this.setState({ errorMessage: 'Oops, looks like something went wrong', loading: false }));
+  };
 
   constructor(props) {
     super(props);
     this.state = {
       loading: true,
       photos: [],
-      page: 0,
-      cache: [],
+      page: 1,
+      // cache: [],
       timestamp: new Date().getTime(),
+      errorMessage: '',
     };
-
-    this.getGallery(this.state.page).then((data) => {
-      const cache = slices(10)(data.data.data);
-      this.setState({
-        loading: false,
-        photos: cache[this.state.page],
-        cache,
-      });
-    });
   }
 
-  // TODO: handle pagination calculation on the server
-  // TODO: add catch
+  componentDidMount() {
+    this.getGallery(this.state.page);
+  }
+
   handlePagination = (page) => {
-    let { cache } = this.state;
-    if (!cache[page]) {
-      this.setState({ loading: true, photos: [] });
-      this.getGallery(page).then((data) => {
-        cache = cache.concat(slices(10)(data.data.data));
-        this.setState({
-          loading: false,
-          photos: cache[page],
-          cache,
-          page,
-        });
-      });
-    } else {
-      this.setState({
-        photos: cache[page],
-        page,
-      });
-    }
+    this.getGallery(page);
   };
 
   render() {
     const { handlePagination } = this;
-    const { loading, photos, page } = this.state;
+    const {
+      loading, photos, page, errorMessage,
+    } = this.state;
     return (
       <div>
-        <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-          {loading && <div>Loading...</div>}{' '}
+        {!loading && !errorMessage && <h2>Plese select an image</h2>}
+        <div
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            alignContent: 'center',
+            placeContent: 'center',
+            minHeight: '150px',
+          }}
+        >
+          {loading && <div>Loading...</div>}
+          {errorMessage && (
+            <div>
+              {errorMessage}&nbsp;
+              <button onClick={() => this.getGallery(this.state.page)}>Retry</button>
+            </div>
+          )}
           {photos.length > 0 &&
+            !loading &&
             photos.map(photo => (
               /*
                 Loading the image from browser cache onto the canvas causes the canvas to be tainted:
@@ -71,13 +77,16 @@ class Gallery extends Component {
               <Image {...this.props} key={photo.id} src={`${photo.link}?t=${this.state.timestamp}`} />
             ))}
         </div>
-        <div>
-          <button onClick={() => handlePagination(page - 1)} disabled={page < 1}>
-            &lt; Previous
-          </button>
-          <span>{page + 1}</span>
-          <button onClick={() => handlePagination(page + 1)}>Next &gt;</button>
-        </div>
+        {!loading &&
+          !errorMessage && (
+            <div>
+              <button onClick={() => handlePagination(page - 1)} disabled={page < 1}>
+                &lt; Previous
+              </button>
+              <span> {page} </span>
+              <button onClick={() => handlePagination(page + 1)}>Next &gt;</button>
+            </div>
+          )}
       </div>
     );
   }

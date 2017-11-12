@@ -1,7 +1,10 @@
 import React, { Component } from 'react';
 import propTypes from 'prop-types';
+import html2canvas from 'html2canvas';
+import axios from 'axios';
 
 import slices from '../../utils/slices';
+import toBase64 from '../../utils/toBase64';
 
 const handleUpdateMosaic = (img, width, height, tileWidth, tileHeight) => {
   const getAverageColour = (pixels) => {
@@ -63,6 +66,7 @@ class Mosaic extends Component {
     this.state = {
       mosaicTiles: [],
       statusMessage: '',
+      shareUrl: '',
     };
   }
 
@@ -85,24 +89,74 @@ class Mosaic extends Component {
     }
   }
 
-  // console.log(1, state.mosaicTiles);
   render() {
     return (
       <div>
-        {this.state.mosaicTiles.length < 1 && !this.props.img && <div>Please select or upload an image</div>}
         <div>{this.state.statusMessage}</div>
         {this.state.mosaicTiles.length > 0 && (
-          <svg width={this.props.width} height={this.props.height}>
-            {this.state.mosaicTiles.map(tile => (
-              <circle
-                key={`x${tile.x}y${tile.y}`}
-                cx={tile.x + ((tile.w / 2) | 0)}
-                cy={tile.y + ((tile.h / 2) | 0)}
-                r={(tile.w + tile.h) / 4}
-                fill={`rgba(${tile.r},${tile.g},${tile.b},${tile.a})`}
-              />
-            ))}
-          </svg>
+          <div
+            style={{ width: this.props.width, height: this.props.height, margin: 'auto' }}
+            ref={(mosaicContainer) => {
+              this.mosaicContainer = mosaicContainer;
+            }}
+          >
+            <svg width={this.props.width} height={this.props.height}>
+              {this.state.mosaicTiles.map(tile => (
+                <circle
+                  key={`x${tile.x}y${tile.y}`}
+                  cx={tile.x + ((tile.w / 2) | 0)}
+                  cy={tile.y + ((tile.h / 2) | 0)}
+                  r={(tile.w + tile.h) / 4}
+                  fill={`rgba(${tile.r},${tile.g},${tile.b},${tile.a})`}
+                />
+              ))}
+            </svg>
+          </div>
+        )}
+        {this.state.mosaicTiles.length > 0 && (
+          <div>
+            <button
+              onClick={() => {
+                // const { width, height } = this.props;
+                // const canvas = document.createElement('canvas');
+                // canvas.setAttribute('width', width);
+                // canvas.setAttribute('height', height);
+                // canvas.style.display = 'none';
+                // document.body.appendChild(canvas);
+                // const ctx = canvas.getContext('2d');
+                html2canvas(this.mosaicContainer, {
+                  useCORS: true,
+                  allowTaint: true,
+                  logging: true,
+                }).then((canvas) => {
+                  canvas.style.display = 'none';
+                  document.body.appendChild(canvas);
+                  canvas.toBlob((blob) => {
+                    toBase64(blob).then(encodedImage =>
+                      axios({
+                        method: 'POST',
+                        url: 'http://localhost:3001/image',
+                        data: { image: encodedImage },
+                      }).then(({ data }) => {
+                        this.setState({
+                          shareUrl: data.data.link,
+                        });
+                        canvas.remove();
+                      }).catch(() => canvas.remove()));
+                  }, 'image/png');
+                });
+              }}
+            >
+              Share on IMGUR
+            </button>
+            <div>
+              {this.state.shareUrl && (
+                <a href={this.state.shareUrl} target="_blank">
+                  {this.state.shareUrl}
+                </a>
+              )}
+            </div>
+          </div>
         )}
       </div>
     );

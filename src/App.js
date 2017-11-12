@@ -6,7 +6,6 @@ import Mosaic from './Components/Mosaic/Mosaic';
 import FileUpload from './Components/FileUpload/FileUpload';
 import './App.css';
 
-// TODO: handle pagination in URL
 class App extends Component {
   constructor(props) {
     super(props);
@@ -16,7 +15,6 @@ class App extends Component {
     };
   }
 
-  // TODO: refactor to a mosaic container
   handleSelectImage = (image) => {
     this.setState({ selectedImage: image });
   };
@@ -29,6 +27,9 @@ class App extends Component {
           <Gallery selectImage={this.handleSelectImage} subreddit="earthporn" />
         </div>
         <div>
+          <FileUpload selectImage={this.handleSelectImage} />
+        </div>
+        <div>
           {
             <Mosaic
               img={selectedImage}
@@ -39,9 +40,6 @@ class App extends Component {
               mosaicTiles={mosaicTiles}
             />
           }
-        </div>
-        <div>
-          <FileUpload selectImage={this.handleSelectImage} />
         </div>
       </div>
     );
