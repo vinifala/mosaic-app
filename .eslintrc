@@ -1,7 +1,12 @@
 {
-  "plugins": ["jest"],
+  "plugins": [
+    "jest"
+  ],
   "extends": "airbnb",
   "parser": "babel-eslint",
+  "env": {
+    "jest/globals": true
+  },
   "rules": {
     "no-underscore-dangle": 0,
     "import/no-extraneous-dependencies": 0,
@@ -13,7 +18,12 @@
     "react/forbid-prop-types": 0,
     "no-param-reassign": 0,
     "no-console": 0,
-    "max-len": [2, { "code": 120 }],
+    "max-len": [
+      2,
+      {
+        "code": 120
+      }
+    ],
     "react/no-unused-prop-types": 0,
     "react/sort-comp": 0,
     "no-bitwise": 0
