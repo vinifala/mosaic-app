@@ -132,7 +132,7 @@ class Mosaic extends Component {
       setTimeout(() => {
         const mosaicTiles = handleUpdateMosaic(img, width, height, tileWidth, tileHeight);
         this.setState({ mosaicTiles, statusMessage: '' });
-      }, 2);
+      }, 20);
     }
   }
 

@@ -26,10 +26,10 @@ class FileUpload extends Component {
       img: '',
     });
 
-  handleSuccessfulUpload = ({ data }) => {
+  displayImage = (img) => {
     this.setState({
       uploading: false,
-      img: `${data.data.link}?t=${new Date().getTime()}`,
+      img,
       errorMessage: '',
     });
   };
@@ -40,7 +40,7 @@ class FileUpload extends Component {
       url: 'http://localhost:3001/image',
       data: { image: encodedImage },
     })
-      .then(this.handleSuccessfulUpload)
+      .then(this.displayImage)
       .catch(this.handleFailUpload);
 
   handleFileChange = (e) => {
@@ -57,7 +57,7 @@ class FileUpload extends Component {
     }
     this.setState({ uploading: true, errorMessage: '' });
     toBase64(e.target.files[0])
-      .then(this.uploadImage)
+      .then(this.displayImage)
       .catch(this.handleFailUpload);
   };
 
