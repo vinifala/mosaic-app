@@ -5,14 +5,14 @@
   "private": true,
   "dependencies": {
     "antd": "^2.13.9",
-    "axios": "^0.17.0",
+    "axios": "^0.18.0",
     "body-parser": "^1.18.2",
     "dotenv": "^4.0.0",
-    "express": "^4.16.2",
+    "express": "^4.16.3",
     "html2canvas": "^0.5.0-beta4",
-    "prop-types": "^15.6.0",
-    "react": "^16.0.0",
-    "react-dom": "^16.0.0"
+    "prop-types": "^15.6.1",
+    "react": "^16.3.2",
+    "react-dom": "^16.3.2"
   },
   "scripts": {
     "server": "supervisor server/server.js",
@@ -26,10 +26,11 @@
     "babel-jest": "^21.2.0",
     "babel-preset-es2015": "^6.24.1",
     "babel-preset-react": "^6.24.1",
-    "enzyme": "^3.2.0",
-    "enzyme-adapter-react-16": "^1.1.0",
+    "enzyme": "^3.3.0",
+    "enzyme-adapter-react-16": "^1.1.1",
     "jest": "^21.2.1",
     "jest-cli": "^21.2.1",
+    "react-scripts": "^1.1.4",
     "supervisor": "^0.12.0"
   }
 }

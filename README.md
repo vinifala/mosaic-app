@@ -13,7 +13,7 @@ Once you have your ID, edit the file `./example.env` and replace `Your IMGUR cli
 IMGUR_CLIENT_ID=Your IMGUR client ID 
 ```
 
-Then rename `example.env` to `.env` to prevent git from commiting your credential.
+Then rename `example.env` to `.env` to prevent git from committing your credential.
 
 ### Install dependencies
 ```bash
