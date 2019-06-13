@@ -17,7 +17,7 @@ class App extends Component {
     };
   }
 
-  handleSelectImage = (image) => {
+  handleSelectImage = image => {
     this.setState({ selectedImage: image });
   };
 
@@ -27,7 +27,10 @@ class App extends Component {
       <LocaleProvider locale={enUS}>
         <div className="App">
           <div>
-            <Gallery selectImage={this.handleSelectImage} subreddit="earthporn" />
+            <Gallery
+              selectImage={this.handleSelectImage}
+              subreddit="earthporn"
+            />
           </div>
           <div>
             <FileUpload selectImage={this.handleSelectImage} />

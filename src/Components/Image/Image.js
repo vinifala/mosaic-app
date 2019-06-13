@@ -37,7 +37,10 @@ class Image extends Component {
           overflow: 'hidden',
           border: 0,
           padding: 0,
-          cursor: !this.state.loading && !this.state.errorMessage ? 'pointer' : 'not-allowed',
+          cursor:
+            !this.state.loading && !this.state.errorMessage
+              ? 'pointer'
+              : 'not-allowed',
         }}
       >
         {this.state.loading && (
@@ -48,7 +51,7 @@ class Image extends Component {
         {this.state.errorMessage && <span>{this.state.errorMessage}</span>}
         {!this.state.errorMessage && (
           <img
-            ref={(image) => {
+            ref={image => {
               this.domImage = image;
             }}
             alt="Unable to load ='("
@@ -59,7 +62,11 @@ class Image extends Component {
               }
             }}
             onError={() =>
-              this.setState({ loading: false, errorMessage: 'Oops, we were not able to load this image.' })}
+              this.setState({
+                loading: false,
+                errorMessage: 'Oops, we were not able to load this image.',
+              })
+            }
             src={this.props.src}
             crossOrigin="anonymous"
             style={{

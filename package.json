@@ -21,7 +21,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
-    "lint": "eslint ./src/"
+    "lint": "eslint ./src/ ./server/",
+    "prettier": "prettier \"./src/**/*.js\" --write --loglevel warn && prettier \"./server/**/*.js\" --write --loglevel warn"
   },
   "devDependencies": {
     "babel-preset-es2015": "^6.24.1",
@@ -35,6 +36,7 @@
     "eslint-plugin-jsx-a11y": "^6.0.3",
     "eslint-plugin-react": "^7.7.0",
     "jest-cli": "^24.8.0",
+    "prettier": "^1.18.2",
     "react-scripts": "^3.0.1",
     "supervisor": "^0.12.0"
   },

@@ -4,7 +4,7 @@ const path = require('path');
 const axios = require('axios');
 const bodyParser = require('body-parser');
 
-const slices = size => (arr) => {
+const slices = size => arr => {
   const a = [];
   for (let i = 0; i < arr.length; i += size) {
     a.push(arr.slice(i, i + size));
@@ -60,14 +60,19 @@ app.get(
       res.json(imgListCache[page]);
     } else {
       axios
-        .get(`https://api.imgur.com/3/gallery/r/${subreddit}/time/${Math.floor(page / 10)}`, {
-          headers: {
-            Authorization: `Client-ID ${process.env.IMGUR_CLIENT_ID}`,
-            'Content-Type': 'application/x-www-form-urlencoded',
+        .get(
+          `https://api.imgur.com/3/gallery/r/${subreddit}/time/${Math.floor(
+            page / 10,
+          )}`,
+          {
+            headers: {
+              Authorization: `Client-ID ${process.env.IMGUR_CLIENT_ID}`,
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
           },
-        })
+        )
         .catch(console.log)
-        .then((galleryData) => {
+        .then(galleryData => {
           const { data } = galleryData.data;
           imgListCache = imgListCache.concat(slices(10)(data));
           return res.json(imgListCache[page]);

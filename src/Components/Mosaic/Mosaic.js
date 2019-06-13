@@ -10,7 +10,7 @@ import slices from '../../utils/slices';
 import toBase64 from '../../utils/toBase64';
 
 const handleUpdateMosaic = (img, width, height, tileWidth, tileHeight) => {
-  const getAverageColour = (pixels) => {
+  const getAverageColour = pixels => {
     const sum = pixels.reduce(
       (acc, pixel) => {
         acc[0] += pixel[0];
@@ -37,7 +37,17 @@ const handleUpdateMosaic = (img, width, height, tileWidth, tileHeight) => {
 
   // outputs the image onto canvas
   img.crossOrigin = 'Anonymous';
-  ctx.drawImage(img, 0, 0, img.naturalWidth, img.naturalHeight, 0, 0, width, height);
+  ctx.drawImage(
+    img,
+    0,
+    0,
+    img.naturalWidth,
+    img.naturalHeight,
+    0,
+    0,
+    width,
+    height,
+  );
 
   const mosaicTiles = [];
   for (let j = 0; j + tileHeight <= height; j += tileHeight) {
@@ -82,7 +92,9 @@ class Mosaic extends Component {
     });
 
   handleShareImageOnImgur = () =>
-    this.createImageFromMosaic(this.mosaicContainer).then(this.handleCanvasCreatedFromMosaic);
+    this.createImageFromMosaic(this.mosaicContainer).then(
+      this.handleCanvasCreatedFromMosaic,
+    );
 
   handleSuccessfulUpload = ({ data }) =>
     this.setState({
@@ -94,7 +106,8 @@ class Mosaic extends Component {
   handleFailedUpload = () =>
     this.setState({
       sharing: false,
-      sharingError: 'Sorry, something went wrong while sharing, please try again',
+      sharingError:
+        'Sorry, something went wrong while sharing, please try again',
     });
 
   uploadEncodedImage = encodedImage =>
@@ -106,20 +119,18 @@ class Mosaic extends Component {
       .then(this.handleSuccessfulUpload)
       .catch(this.handleFailedUpload);
 
-  handleCanvasCreatedFromMosaic = (canvas) => {
+  handleCanvasCreatedFromMosaic = canvas => {
     this.setState({ sharing: true, sharingError: '' });
     canvas.style.display = 'none';
     document.body.appendChild(canvas);
-    canvas.toBlob((blob) => {
+    canvas.toBlob(blob => {
       toBase64(blob)
         .then(this.uploadEncodedImage)
         .then(() => canvas.remove());
     }, 'image/png');
   };
 
-  componentWillReceiveProps({
-    width, height, tileWidth, tileHeight, img,
-  }) {
+  componentWillReceiveProps({ width, height, tileWidth, tileHeight, img }) {
     if (img !== this.props.img) {
       this.setState({ statusMessage: 'Calculating...' });
 
@@ -130,7 +141,13 @@ class Mosaic extends Component {
       // allows react to squeeze a DOM update before calling handleUpdateMosaic.
       // This way we're able to see the status update on screen. source: https://youtu.be/ZCuYPiUIONs?t=11m44s
       setTimeout(() => {
-        const mosaicTiles = handleUpdateMosaic(img, width, height, tileWidth, tileHeight);
+        const mosaicTiles = handleUpdateMosaic(
+          img,
+          width,
+          height,
+          tileWidth,
+          tileHeight,
+        );
         this.setState({ mosaicTiles, statusMessage: '' });
       }, 20);
     }
@@ -153,12 +170,14 @@ class Mosaic extends Component {
         )}
         {this.state.mosaicTiles.length > 0 && (
           <div
-            className={`mosaic__stage${this.state.statusMessage ? ' mosaic--loading' : ''}`}
+            className={`mosaic__stage${
+              this.state.statusMessage ? ' mosaic--loading' : ''
+            }`}
             style={{
               width,
               height,
             }}
-            ref={(mosaicContainer) => {
+            ref={mosaicContainer => {
               this.mosaicContainer = mosaicContainer;
             }}
           >
@@ -177,14 +196,27 @@ class Mosaic extends Component {
         )}
         {this.state.mosaicTiles.length > 0 && (
           <div>
-            <Button disabled={this.state.sharing || this.state.statusMessage} onClick={this.handleShareImageOnImgur}>
+            <Button
+              disabled={this.state.sharing || this.state.statusMessage}
+              onClick={this.handleShareImageOnImgur}
+            >
               Share on IMGUR
             </Button>
             <div>
-              {this.state.sharingError && <Alert message={this.state.sharingError} type="error" showIcon />}
+              {this.state.sharingError && (
+                <Alert
+                  message={this.state.sharingError}
+                  type="error"
+                  showIcon
+                />
+              )}
               {this.state.sharing && <Spin tip="Sharing..." />}
               {this.state.shareUrl && (
-                <a href={this.state.shareUrl} target="_blank">
+                <a
+                  href={this.state.shareUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   {this.state.shareUrl}
                 </a>
               )}

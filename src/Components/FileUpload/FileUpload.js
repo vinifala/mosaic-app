@@ -22,11 +22,12 @@ class FileUpload extends Component {
   handleFailUpload = () =>
     this.setState({
       uploading: false,
-      errorMessage: 'Oops, something went wrong while trying to upload your image, please try again.',
+      errorMessage:
+        'Oops, something went wrong while trying to upload your image, please try again.',
       img: '',
     });
 
-  displayImage = (img) => {
+  displayImage = img => {
     this.setState({
       uploading: false,
       img,
@@ -43,16 +44,20 @@ class FileUpload extends Component {
       .then(this.displayImage)
       .catch(this.handleFailUpload);
 
-  handleFileChange = (e) => {
+  handleFileChange = e => {
     if (!e.target.files[0]) {
       return;
     }
     if (e.target.files[0].size > 1024 * 10000) {
-      this.setState({ errorMessage: 'File too large, maximum allowed size: 10Mb' });
+      this.setState({
+        errorMessage: 'File too large, maximum allowed size: 10Mb',
+      });
       return;
     }
     if (e.target.files[0].type.search('image') !== 0) {
-      this.setState({ errorMessage: 'File type not allowed, only images, please' });
+      this.setState({
+        errorMessage: 'File type not allowed, only images, please',
+      });
       return;
     }
     this.setState({ uploading: true, errorMessage: '' });
@@ -66,7 +71,12 @@ class FileUpload extends Component {
     return (
       <div>
         <h2>...or upload an image</h2>
-        <input accept="image/*" disabled={uploading} type="file" onChange={this.handleFileChange} />
+        <input
+          accept="image/*"
+          disabled={uploading}
+          type="file"
+          onChange={this.handleFileChange}
+        />
         {uploading && (
           <div>
             <Spin tip="Sending image..." />

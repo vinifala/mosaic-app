@@ -29,7 +29,11 @@ class Gallery extends Component {
       page,
     });
 
-  handleGalleryError = () => this.setState({ errorMessage: 'Oops, looks like something went wrong', loading: false });
+  handleGalleryError = () =>
+    this.setState({
+      errorMessage: 'Oops, looks like something went wrong',
+      loading: false,
+    });
 
   getGallery = (page = 1) => {
     this.setState({ loading: true, errorMessage: '' });
@@ -43,15 +47,13 @@ class Gallery extends Component {
     this.getGallery(this.state.page);
   }
 
-  handlePagination = (page) => {
+  handlePagination = page => {
     this.getGallery(page);
   };
 
   render() {
     const { handlePagination } = this;
-    const {
-      loading, photos, page, errorMessage,
-    } = this.state;
+    const { loading, photos, page, errorMessage } = this.state;
     return (
       <div>
         {!loading && !errorMessage && <h2>Plese select an image</h2>}
@@ -72,7 +74,9 @@ class Gallery extends Component {
           {errorMessage && (
             <div>
               <Alert message={errorMessage} type="error" showIcon />
-              <Button onClick={() => this.getGallery(this.state.page)}>Retry</Button>
+              <Button onClick={() => this.getGallery(this.state.page)}>
+                Retry
+              </Button>
             </div>
           )}
           {photos.length > 0 &&
@@ -85,19 +89,27 @@ class Gallery extends Component {
                 including a timestamp as a query string when requesting the image forces the browser
                 to download the image every time.
               */
-              <Image {...this.props} key={photo.id} src={`${photo.link}?t=${this.state.timestamp}`} />
+              <Image
+                {...this.props}
+                key={photo.id}
+                src={`${photo.link}?t=${this.state.timestamp}`}
+              />
             ))}
         </div>
-        {!loading &&
-          !errorMessage && (
-            <div>
-              <Button onClick={() => handlePagination(page - 1)} disabled={page < 2}>
-                &lt; Previous
-              </Button>
-              <span> Page {page} </span>
-              <Button onClick={() => handlePagination(page + 1)}>Next &gt;</Button>
-            </div>
-          )}
+        {!loading && !errorMessage && (
+          <div>
+            <Button
+              onClick={() => handlePagination(page - 1)}
+              disabled={page < 2}
+            >
+              &lt; Previous
+            </Button>
+            <span> Page {page} </span>
+            <Button onClick={() => handlePagination(page + 1)}>
+              Next &gt;
+            </Button>
+          </div>
+        )}
       </div>
     );
   }
