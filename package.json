@@ -10,9 +10,11 @@
     "dotenv": "^4.0.0",
     "express": "^4.16.3",
     "html2canvas": "^0.5.0-beta4",
+    "jquery": "^3.4.1",
     "prop-types": "^15.6.1",
     "react": "^16.3.2",
-    "react-dom": "^16.3.2"
+    "react-dom": "^16.3.2",
+    "typescript": "^3.5.2"
   },
   "scripts": {
     "server": "supervisor server/server.js",
@@ -30,7 +32,7 @@
     "enzyme": "^3.3.0",
     "enzyme-adapter-react-16": "^1.1.1",
     "eslint": "^5.16.0",
-    "eslint-config-airbnb": "^16.1.0",
+    "eslint-config-airbnb": "^17.1.0",
     "eslint-plugin-import": "^2.11.0",
     "eslint-plugin-jest": "^21.15.1",
     "eslint-plugin-jsx-a11y": "^6.0.3",
