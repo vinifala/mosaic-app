@@ -155,6 +155,13 @@ class Mosaic extends Component {
 
   render() {
     const { width, height } = this.props;
+    const {
+      statusMessage,
+      mosaicTiles,
+      sharing,
+      sharingError,
+      shareUrl,
+    } = this.state;
     return (
       <div
         className="mosaic__container"
@@ -163,15 +170,15 @@ class Mosaic extends Component {
           height,
         }}
       >
-        {this.state.statusMessage && (
+        {statusMessage && (
           <div className="mosaic__status-message">
-            <Spin size="large" tip={this.state.statusMessage} />
+            <Spin size="large" tip={statusMessage} />
           </div>
         )}
-        {this.state.mosaicTiles.length > 0 && (
+        {mosaicTiles.length > 0 && (
           <div
             className={`mosaic__stage${
-              this.state.statusMessage ? ' mosaic--loading' : ''
+              statusMessage ? ' mosaic--loading' : ''
             }`}
             style={{
               width,
@@ -182,7 +189,7 @@ class Mosaic extends Component {
             }}
           >
             <svg width={width} height={height}>
-              {this.state.mosaicTiles.map(tile => (
+              {mosaicTiles.map(tile => (
                 <circle
                   key={`x${tile.x}y${tile.y}`}
                   cx={tile.x + ((tile.w / 2) | 0)}
@@ -194,30 +201,22 @@ class Mosaic extends Component {
             </svg>
           </div>
         )}
-        {this.state.mosaicTiles.length > 0 && (
+        {mosaicTiles.length > 0 && (
           <div>
             <Button
-              disabled={this.state.sharing || this.state.statusMessage}
+              disabled={sharing || statusMessage}
               onClick={this.handleShareImageOnImgur}
             >
               Share on IMGUR
             </Button>
             <div>
-              {this.state.sharingError && (
-                <Alert
-                  message={this.state.sharingError}
-                  type="error"
-                  showIcon
-                />
+              {sharingError && (
+                <Alert message={sharingError} type="error" showIcon />
               )}
-              {this.state.sharing && <Spin tip="Sharing..." />}
-              {this.state.shareUrl && (
-                <a
-                  href={this.state.shareUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {this.state.shareUrl}
+              {sharing && <Spin tip="Sharing..." />}
+              {shareUrl && (
+                <a href={shareUrl} target="_blank" rel="noopener noreferrer">
+                  {shareUrl}
                 </a>
               )}
             </div>

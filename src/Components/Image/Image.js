@@ -20,36 +20,38 @@ class Image extends Component {
   }
 
   imageTimedOut = () => {
-    if (this.state.loading) {
+    const { loading } = this.state;
+    if (loading) {
       this.setState({ loading: false, errorMessage: "Image timed out ='(" });
     }
   };
+
   handleImageLoad = () => this.setState({ loading: false });
 
   render() {
+    const { loading, errorMessage } = this.state;
+    const { selectImage, autoSelect, src } = this.props;
     return (
       <button
-        disabled={this.state.loading || this.state.errorMessage}
-        onClick={() => this.props.selectImage(this.domImage)}
+        type="button"
+        disabled={loading || errorMessage}
+        onClick={() => selectImage(this.domImage)}
         style={{
           width: '10%',
           height: '150px',
           overflow: 'hidden',
           border: 0,
           padding: 0,
-          cursor:
-            !this.state.loading && !this.state.errorMessage
-              ? 'pointer'
-              : 'not-allowed',
+          cursor: !loading && !errorMessage ? 'pointer' : 'not-allowed',
         }}
       >
-        {this.state.loading && (
+        {loading && (
           <span>
             <Spin />
           </span>
         )}
-        {this.state.errorMessage && <span>{this.state.errorMessage}</span>}
-        {!this.state.errorMessage && (
+        {errorMessage && <span>{errorMessage}</span>}
+        {!errorMessage && (
           <img
             ref={image => {
               this.domImage = image;
@@ -57,8 +59,8 @@ class Image extends Component {
             alt="Unable to load ='("
             onLoad={() => {
               this.handleImageLoad();
-              if (this.props.autoSelect) {
-                this.props.selectImage(this.domImage);
+              if (autoSelect) {
+                selectImage(this.domImage);
               }
             }}
             onError={() =>
@@ -67,11 +69,11 @@ class Image extends Component {
                 errorMessage: 'Oops, we were not able to load this image.',
               })
             }
-            src={this.props.src}
+            src={src}
             crossOrigin="anonymous"
             style={{
               width: '100%',
-              display: this.state.loading ? 'none' : 'block',
+              display: loading ? 'none' : 'block',
               objectFit: 'cover',
               height: '100%',
             }}
