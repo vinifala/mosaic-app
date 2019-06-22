@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "antd": "^2.13.9",
+    "antd": "^3.19.7",
     "axios": "^0.18.0",
     "body-parser": "^1.18.2",
     "dotenv": "^4.0.0",
