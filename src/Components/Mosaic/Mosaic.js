@@ -29,14 +29,20 @@ const handleUpdateMosaic = (img, width, height, tileWidth, tileHeight) => {
   const parseImageData = slices(4);
 
   const canvas = document.createElement('canvas');
-  canvas.setAttribute('width', width);
-  canvas.setAttribute('height', height);
+  const imageAspect = img.naturalHeight / img.naturalWidth;
+  const canvasAspect = height / width;
+  const relativeWidth =
+    imageAspect < canvasAspect ? width : height / imageAspect;
+  const relativeHeight =
+    imageAspect > canvasAspect ? height : width * imageAspect;
+
+  canvas.setAttribute('width', relativeWidth);
+  canvas.setAttribute('height', relativeHeight);
   canvas.style.display = 'none';
   document.body.appendChild(canvas);
   const ctx = canvas.getContext('2d');
 
-  // outputs the image onto canvas
-  img.crossOrigin = 'Anonymous';
+  /* average by image resizing
   ctx.drawImage(
     img,
     0,
@@ -45,13 +51,49 @@ const handleUpdateMosaic = (img, width, height, tileWidth, tileHeight) => {
     img.naturalHeight,
     0,
     0,
-    width,
-    height,
+    Math.ceil(width / tileWidth),
+    Math.ceil(height / tileHeight),
   );
 
   const mosaicTiles = [];
-  for (let j = 0; j + tileHeight <= height; j += tileHeight) {
-    for (let i = 0; i + tileWidth <= width; i += tileWidth) {
+  for (let j = 0; j < height / tileHeight; j += 1) {
+    for (let i = 0; i < width / tileWidth; i += 1) {
+      const imgData = ctx.getImageData(i, j, 1, 1);
+      // const imgDataArray = parseImageData(Array.from(imgData.data));
+      const averageColour = Array.from(imgData.data);
+
+      mosaicTiles.push({
+        r: averageColour[0],
+        g: averageColour[1],
+        b: averageColour[2],
+        a: averageColour[3],
+        x: i * tileWidth,
+        y: j * tileHeight,
+        w: tileWidth,
+        h: tileHeight,
+      });
+    }
+  }
+  */
+
+  // outputs the image onto canvas
+  img.crossOrigin = 'Anonymous';
+
+  ctx.drawImage(
+    img,
+    0,
+    0,
+    img.naturalWidth,
+    img.naturalHeight,
+    0,
+    0,
+    relativeWidth,
+    relativeHeight,
+  );
+
+  const mosaicTiles = [];
+  for (let j = 0; j + tileHeight <= relativeHeight; j += tileHeight) {
+    for (let i = 0; i + tileWidth <= relativeWidth; i += tileWidth) {
       const imgData = ctx.getImageData(i, j, tileWidth, tileHeight);
       const imgDataArray = parseImageData(Array.from(imgData.data));
       const averageColour = getAverageColour(imgDataArray);
