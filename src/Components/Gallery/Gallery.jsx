@@ -80,6 +80,8 @@ function Gallery(props) {
     [fetchPrevPage, fetchNextPage],
   ] = useFetchPages(props.subreddit);
 
+  const currentPageCopy = `Page ${page}`;
+
   return (
     <div>
       {!loading && !errorMessage && <h2>Plese select an image</h2>}
@@ -125,7 +127,7 @@ function Gallery(props) {
           <Button onClick={fetchPrevPage} disabled={page < 2}>
             &lt; Previous
           </Button>
-          <span> Page {page} </span>
+          <span>{currentPageCopy}</span>
           <Button onClick={fetchNextPage}>Next &gt;</Button>
         </div>
       )}
