@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import propTypes from 'prop-types';
-import html2canvas from 'html2canvas';
 import axios from 'axios';
 
 import MosaicCanvas from '../MosaicCanvas/MosaicCanvas';
@@ -129,12 +128,6 @@ class Mosaic extends Component {
   }
 
   mosaicCanvasReference;
-
-  createImageFromMosaic = mosaicContainer =>
-    html2canvas(mosaicContainer, {
-      useCORS: true,
-      allowTaint: true,
-    });
 
   handleSuccessfulUpload = ({ data }) =>
     this.setState({

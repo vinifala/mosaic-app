@@ -9,7 +9,6 @@
     "body-parser": "^1.19.0",
     "dotenv": "^8.0.0",
     "express": "^4.17.1",
-    "html2canvas": "^1.0.0-rc.3",
     "jquery": "^3.4.1",
     "prop-types": "^15.7.2",
     "react": "^16.8.6",
