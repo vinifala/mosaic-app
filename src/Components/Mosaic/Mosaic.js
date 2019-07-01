@@ -3,6 +3,7 @@ import propTypes from 'prop-types';
 import html2canvas from 'html2canvas';
 import axios from 'axios';
 
+import MosaicCanvas from '../MosaicCanvas/MosaicCanvas';
 import Alert from '../antd/Alert';
 import Spin from '../antd/Spin';
 import Button from '../antd/Button';
@@ -42,7 +43,7 @@ const handleUpdateMosaic = (img, width, height, tileWidth, tileHeight) => {
   document.body.appendChild(canvas);
   const ctx = canvas.getContext('2d');
 
-  /* average by image resizing
+  /* average by canvas resizing (sharper)
   ctx.drawImage(
     img,
     0,
@@ -127,16 +128,13 @@ class Mosaic extends Component {
     };
   }
 
+  mosaicCanvasReference;
+
   createImageFromMosaic = mosaicContainer =>
     html2canvas(mosaicContainer, {
       useCORS: true,
       allowTaint: true,
     });
-
-  handleShareImageOnImgur = () =>
-    this.createImageFromMosaic(this.mosaicContainer).then(
-      this.handleCanvasCreatedFromMosaic,
-    );
 
   handleSuccessfulUpload = ({ data }) =>
     this.setState({
@@ -163,14 +161,15 @@ class Mosaic extends Component {
 
   handleCanvasCreatedFromMosaic = canvas => {
     this.setState({ sharing: true, sharingError: '' });
-    canvas.style.display = 'none';
-    document.body.appendChild(canvas);
     canvas.toBlob(blob => {
-      toBase64(blob)
-        .then(this.uploadEncodedImage)
-        .then(() => canvas.remove());
+      toBase64(blob).then(this.uploadEncodedImage);
     }, 'image/png');
   };
+
+  handleShareImageOnImgur = () =>
+    this.handleCanvasCreatedFromMosaic(
+      document.getElementById('mosaic-canvas'),
+    );
 
   componentWillReceiveProps({ width, height, tileWidth, tileHeight, img }) {
     if (img !== this.props.img) {
@@ -196,7 +195,7 @@ class Mosaic extends Component {
   }
 
   render() {
-    const { width, height } = this.props;
+    const { width, height, img } = this.props;
     const {
       statusMessage,
       mosaicTiles,
@@ -204,12 +203,19 @@ class Mosaic extends Component {
       sharingError,
       shareUrl,
     } = this.state;
+
+    const imageAspect = img ? img.naturalHeight / img.naturalWidth : 1;
+    const canvasAspect = height / width;
+    const relativeWidth =
+      imageAspect < canvasAspect ? width : height / imageAspect;
+    const relativeHeight =
+      imageAspect > canvasAspect ? height : width * imageAspect;
     return (
       <div
         className="mosaic__container"
         style={{
-          width,
-          height,
+          relativeWidth,
+          relativeHeight,
         }}
       >
         {statusMessage && (
@@ -223,24 +229,19 @@ class Mosaic extends Component {
               statusMessage ? ' mosaic--loading' : ''
             }`}
             style={{
-              width,
-              height,
+              relativeWidth,
+              relativeHeight,
             }}
             ref={mosaicContainer => {
               this.mosaicContainer = mosaicContainer;
             }}
           >
-            <svg width={width} height={height}>
-              {mosaicTiles.map(tile => (
-                <circle
-                  key={`x${tile.x}y${tile.y}`}
-                  cx={tile.x + ((tile.w / 2) | 0)}
-                  cy={tile.y + ((tile.h / 2) | 0)}
-                  r={(tile.w + tile.h) / 4}
-                  fill={`rgba(${tile.r},${tile.g},${tile.b},${tile.a})`}
-                />
-              ))}
-            </svg>
+            <MosaicCanvas
+              width={relativeWidth}
+              height={relativeHeight}
+              mosaicTiles={mosaicTiles}
+              id="mosaic-canvas"
+            />
           </div>
         )}
         {mosaicTiles.length > 0 && (
