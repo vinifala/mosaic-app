@@ -29,6 +29,9 @@ export default class MosaicCanvas extends React.Component {
 
   componentDidMount() {
     const ctx = this.mosaicCanvas.getContext('2d');
+    // canvas context fill method always fills a path using an anti aliasing algorithm
+    // which causes the circles of the mosaic to appear blurred on their extremity
+    // translating the canvas context by 0.5px on each axis makes the circles sharper
     ctx.translate(0.5, 0.5);
 
     this.handleComponentUpdate();
