@@ -80,6 +80,16 @@ function Gallery(props) {
     [fetchPrevPage, fetchNextPage],
   ] = useFetchPages(props.subreddit);
 
+  const getPhotoLink = ({ images, link }) => {
+    // some reddit submissions are imgur galleries, in this case, we show the
+    // first photo of it
+    if (images && Array.isArray(images) && images.length > 0) {
+      return `${images[0].link}?t=${timestamp}`;
+    }
+
+    return `${link}?t=${timestamp}`;
+  };
+
   const currentPageCopy = `Page ${page}`;
 
   return (
@@ -115,11 +125,7 @@ function Gallery(props) {
               including a timestamp as a query string when requesting the image forces the browser
               to download the image every time.
             */
-            <Image
-              {...props}
-              key={photo.id}
-              src={`${photo.link}?t=${timestamp}`}
-            />
+            <Image {...props} key={photo.id} src={getPhotoLink(photo)} />
           ))}
       </div>
       {!loading && !errorMessage && (

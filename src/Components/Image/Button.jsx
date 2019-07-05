@@ -1,4 +1,3 @@
-// import React from 'react';
 import Button from 'antd/lib/button';
 import 'antd/lib/button/style/index.css';
 
