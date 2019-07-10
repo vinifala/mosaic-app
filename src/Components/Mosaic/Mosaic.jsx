@@ -1,15 +1,12 @@
 import React, { Component } from 'react';
 import propTypes from 'prop-types';
-import axios from 'axios';
 
-import MosaicCanvas from '../MosaicCanvas/MosaicCanvas';
-import Alert from '../antd/Alert';
 import Spin from '../antd/Spin';
-import Button from '../antd/Button';
+import MosaicCanvas from '../MosaicCanvas/MosaicCanvas';
+import ShareStation from '../ShareStation';
 import slices from '../../utils/slices';
-import toBase64 from '../../utils/toBase64';
 
-const handleUpdateMosaic = (img, width, height, tileWidth, tileHeight) => {
+const handleUpdateMosaic = (img, width, height, tileSize) => {
   const getAverageColour = pixels => {
     const sum = pixels.reduce(
       (acc, pixel) => {
@@ -25,7 +22,8 @@ const handleUpdateMosaic = (img, width, height, tileWidth, tileHeight) => {
   };
 
   // parseImageData(arr) slices an array into arrays with length 4.
-  // Therefore, the resulting data structure is an array of colour arrays [[red, green, blue, alpha], ...]
+  // Therefore, the resulting data structure is an array of colour arrays
+  // [[red, green, blue, alpha], ...]
   const parseImageData = slices(4);
 
   const canvas = document.createElement('canvas');
@@ -51,13 +49,13 @@ const handleUpdateMosaic = (img, width, height, tileWidth, tileHeight) => {
     img.naturalHeight,
     0,
     0,
-    Math.ceil(width / tileWidth),
-    Math.ceil(height / tileHeight),
+    Math.ceil(width / tileSize),
+    Math.ceil(height / tileSize),
   );
 
   const mosaicTiles = [];
-  for (let j = 0; j < height / tileHeight; j += 1) {
-    for (let i = 0; i < width / tileWidth; i += 1) {
+  for (let j = 0; j < height / tileSize; j += 1) {
+    for (let i = 0; i < width / tileSize; i += 1) {
       const imgData = ctx.getImageData(i, j, 1, 1);
       // const imgDataArray = parseImageData(Array.from(imgData.data));
       const averageColour = Array.from(imgData.data);
@@ -67,10 +65,9 @@ const handleUpdateMosaic = (img, width, height, tileWidth, tileHeight) => {
         g: averageColour[1],
         b: averageColour[2],
         a: averageColour[3],
-        x: i * tileWidth,
-        y: j * tileHeight,
-        w: tileWidth,
-        h: tileHeight,
+        x: i * tileSize,
+        y: j * tileSize,
+        s: tileSize,
       });
     }
   }
@@ -92,9 +89,9 @@ const handleUpdateMosaic = (img, width, height, tileWidth, tileHeight) => {
   );
 
   const mosaicTiles = [];
-  for (let j = 0; j + tileHeight <= relativeHeight; j += tileHeight) {
-    for (let i = 0; i + tileWidth <= relativeWidth; i += tileWidth) {
-      const imgData = ctx.getImageData(i, j, tileWidth, tileHeight);
+  for (let j = 0; j + tileSize <= relativeHeight; j += tileSize) {
+    for (let i = 0; i + tileSize <= relativeWidth; i += tileSize) {
+      const imgData = ctx.getImageData(i, j, tileSize, tileSize);
       const imgDataArray = parseImageData(Array.from(imgData.data));
       const averageColour = getAverageColour(imgDataArray);
 
@@ -105,8 +102,7 @@ const handleUpdateMosaic = (img, width, height, tileWidth, tileHeight) => {
         a: averageColour[3],
         x: i,
         y: j,
-        w: tileWidth,
-        h: tileHeight,
+        s: tileSize,
       });
     }
   }
@@ -121,50 +117,12 @@ class Mosaic extends Component {
     this.state = {
       mosaicTiles: [],
       statusMessage: '',
-      shareUrl: '',
-      sharing: false,
-      sharingError: '',
     };
   }
 
-  mosaicCanvasReference;
+  mosaicCanvasReference = React.createRef();
 
-  handleSuccessfulUpload = ({ data }) =>
-    this.setState({
-      shareUrl: data.data.link,
-      sharing: false,
-      sharingError: '',
-    });
-
-  handleFailedUpload = () =>
-    this.setState({
-      sharing: false,
-      sharingError:
-        'Sorry, something went wrong while sharing, please try again',
-    });
-
-  uploadEncodedImage = encodedImage =>
-    axios({
-      method: 'POST',
-      url: 'http://localhost:3001/image',
-      data: { image: encodedImage },
-    })
-      .then(this.handleSuccessfulUpload)
-      .catch(this.handleFailedUpload);
-
-  handleCanvasCreatedFromMosaic = canvas => {
-    this.setState({ sharing: true, sharingError: '' });
-    canvas.toBlob(blob => {
-      toBase64(blob).then(this.uploadEncodedImage);
-    }, 'image/png');
-  };
-
-  handleShareImageOnImgur = () =>
-    this.handleCanvasCreatedFromMosaic(
-      document.getElementById('mosaic-canvas'),
-    );
-
-  componentWillReceiveProps({ width, height, tileWidth, tileHeight, img }) {
+  componentWillReceiveProps({ width, height, tileSize, img }) {
     if (img !== this.props.img) {
       this.setState({ statusMessage: 'Calculating...' });
 
@@ -175,27 +133,15 @@ class Mosaic extends Component {
       // allows react to squeeze a DOM update before calling handleUpdateMosaic.
       // This way we're able to see the status update on screen. source: https://youtu.be/ZCuYPiUIONs?t=11m44s
       setTimeout(() => {
-        const mosaicTiles = handleUpdateMosaic(
-          img,
-          width,
-          height,
-          tileWidth,
-          tileHeight,
-        );
+        const mosaicTiles = handleUpdateMosaic(img, width, height, tileSize);
         this.setState({ mosaicTiles, statusMessage: '' });
       }, 20);
     }
   }
 
   render() {
-    const { width, height, img } = this.props;
-    const {
-      statusMessage,
-      mosaicTiles,
-      sharing,
-      sharingError,
-      shareUrl,
-    } = this.state;
+    const { width, height, img, tileSize } = this.props;
+    const { statusMessage, mosaicTiles } = this.state;
 
     const imageAspect = img ? img.naturalHeight / img.naturalWidth : 1;
     const canvasAspect = height / width;
@@ -203,12 +149,14 @@ class Mosaic extends Component {
       imageAspect < canvasAspect ? width : height / imageAspect;
     const relativeHeight =
       imageAspect > canvasAspect ? height : width * imageAspect;
+    const adjustedWidth = Math.floor(relativeWidth / tileSize) * tileSize;
+    const adjustedHeight = Math.floor(relativeHeight / tileSize) * tileSize;
     return (
       <div
         className="mosaic__container"
         style={{
-          relativeWidth,
-          relativeHeight,
+          adjustedWidth,
+          adjustedHeight,
         }}
       >
         {statusMessage && (
@@ -222,42 +170,26 @@ class Mosaic extends Component {
               statusMessage ? ' mosaic--loading' : ''
             }`}
             style={{
-              relativeWidth,
-              relativeHeight,
+              adjustedWidth,
+              adjustedHeight,
             }}
             ref={mosaicContainer => {
               this.mosaicContainer = mosaicContainer;
             }}
           >
             <MosaicCanvas
-              width={relativeWidth}
-              height={relativeHeight}
+              width={adjustedWidth}
+              height={adjustedHeight}
               mosaicTiles={mosaicTiles}
               id="mosaic-canvas"
+              ref={this.mosaicCanvasReference}
             />
           </div>
         )}
-        {mosaicTiles.length > 0 && (
-          <div>
-            <Button
-              disabled={sharing || statusMessage}
-              onClick={this.handleShareImageOnImgur}
-            >
-              Share on IMGUR
-            </Button>
-            <div>
-              {sharingError && (
-                <Alert message={sharingError} type="error" showIcon />
-              )}
-              {sharing && <Spin tip="Sharing..." />}
-              {shareUrl && (
-                <a href={shareUrl} target="_blank" rel="noopener noreferrer">
-                  {shareUrl}
-                </a>
-              )}
-            </div>
-          </div>
-        )}
+        <ShareStation
+          active={mosaicTiles.length > 0 || !statusMessage}
+          canvasRef={this.mosaicCanvasReference}
+        />
       </div>
     );
   }
@@ -269,8 +201,7 @@ Mosaic.defaultProps = {
   img: null,
   width: 320,
   height: 320,
-  tileWidth: 16,
-  tileHeight: 16,
+  tileSize: 16,
   mosaicTiles: [],
 };
 
@@ -278,7 +209,6 @@ Mosaic.propTypes = {
   img: propTypes.object,
   width: propTypes.number,
   height: propTypes.number,
-  tileWidth: propTypes.number,
-  tileHeight: propTypes.number,
+  tileSize: propTypes.number,
   mosaicTiles: propTypes.array,
 };

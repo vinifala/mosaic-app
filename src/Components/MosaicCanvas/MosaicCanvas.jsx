@@ -1,60 +1,50 @@
 import * as React from 'react';
 import propTypes from 'prop-types';
 
-export default class MosaicCanvas extends React.Component {
-  mosaicCanvas;
+const nudgeCanvas = ref => {
+  const ctx = ref.current.getContext('2d');
+  // canvas context fill method always fills a path using an anti aliasing algorithm
+  // which causes the circles of the mosaic to appear blurred on their extremity
+  // translating the canvas context by 0.5px on each axis makes the circles sharper
+  ctx.translate(0.5, 0.5);
+};
 
-  handleComponentUpdate() {
-    const { width, height, mosaicTiles } = this.props;
-    const ctx = this.mosaicCanvas.getContext('2d');
-    ctx.imageSmoothingEnabled = false;
-    ctx.fillStyle = 'white';
-    ctx.fillRect(-1, -1, width + 1, height + 1);
+const handleComponentUpdate = (props, ref) => {
+  const { width, height, mosaicTiles } = props;
+  const ctx = ref.current.getContext('2d');
+  ctx.imageSmoothingEnabled = false;
+  ctx.fillStyle = 'white';
+  ctx.fillRect(-1, -1, width + 1, height + 1);
 
-    mosaicTiles.forEach(({ x, y, h, w, r, g, b, a }) => {
-      ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${a})`;
-      ctx.beginPath();
-      ctx.ellipse(
-        Math.floor(x + w / 2),
-        Math.floor(y + h / 2),
-        Math.round(w / 2),
-        Math.round(h / 2),
-        0,
-        0,
-        2 * Math.PI,
-      );
-      ctx.fill('evenodd');
-    });
-  }
-
-  componentDidMount() {
-    const ctx = this.mosaicCanvas.getContext('2d');
-    // canvas context fill method always fills a path using an anti aliasing algorithm
-    // which causes the circles of the mosaic to appear blurred on their extremity
-    // translating the canvas context by 0.5px on each axis makes the circles sharper
-    ctx.translate(0.5, 0.5);
-
-    this.handleComponentUpdate();
-  }
-
-  componentDidUpdate() {
-    this.handleComponentUpdate();
-  }
-
-  render() {
-    const { height, width, id } = this.props;
-    return (
-      <canvas
-        height={height + 1}
-        width={width + 1}
-        ref={mosaicCanvas => {
-          this.mosaicCanvas = mosaicCanvas;
-        }}
-        id={id}
-      />
+  mosaicTiles.forEach(({ x, y, s, r, g, b, a }) => {
+    ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${a})`;
+    ctx.beginPath();
+    ctx.ellipse(
+      Math.floor(x + s / 2),
+      Math.floor(y + s / 2),
+      Math.round(s / 2),
+      Math.round(s / 2),
+      0,
+      0,
+      2 * Math.PI,
     );
-  }
-}
+    ctx.fill('evenodd');
+  });
+};
+
+const MosaicCanvas = React.forwardRef((props, ref) => {
+  React.useEffect(() => {
+    nudgeCanvas(ref);
+  }, []);
+
+  React.useEffect(() => {
+    handleComponentUpdate(props, ref);
+  });
+
+  const { height, width, id } = props;
+
+  return <canvas height={height + 1} width={width + 1} ref={ref} id={id} />;
+});
 
 MosaicCanvas.defaultProps = {
   height: 320,
@@ -69,3 +59,5 @@ MosaicCanvas.propTypes = {
   width: propTypes.number,
   mosaicTiles: propTypes.array,
 };
+
+export default MosaicCanvas;

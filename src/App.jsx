@@ -41,8 +41,7 @@ class App extends Component {
                 img={selectedImage}
                 width={1000}
                 height={600}
-                tileWidth={6}
-                tileHeight={6}
+                tileSize={10}
                 mosaicTiles={mosaicTiles}
               />
             }
