@@ -83,7 +83,7 @@ app.get(
 
 app.use(
   '/',
-  express.static(path.join(__dirname, '/../build'), {
+  express.static(path.join(__dirname, '/../dist'), {
     setHeaders(res) {
       res.set('Access-Control-Allow-Origin', '*');
       res.set('Cache-Control', 'no-cache');
