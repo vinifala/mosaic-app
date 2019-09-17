@@ -17,16 +17,16 @@ Then rename `example.env` to `.env` to prevent git from committing your credenti
 
 ### Install dependencies
 ```bash
-yarn install
+npm install
 ``` 
 ### Start the server
 ```bash
-yarn run start
+npm run start
 ``` 
 ### We're live! (well, kind of)
 Access [http://localhost:3001](http://localhost:3001)
 
 #### Don't forget about tests
 ```bash
-yarn run test
+npm run test
 ```
