@@ -1,0 +1,8 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`File upload component's default state should match snapshot 1`] = `
+Object {
+  "errorMessage": "",
+  "img": "",
+}
+`;
