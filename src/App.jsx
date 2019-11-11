@@ -1,55 +1,44 @@
-import React, { Component } from 'react';
+import React from 'react';
 import propTypes from 'prop-types';
-import LocaleProvider from 'antd/lib/locale-provider';
+import ConfigProvider from 'antd/lib/config-provider';
 import enUS from 'antd/lib/locale-provider/en_US';
 
 import Gallery from './Components/Gallery/Gallery';
 import Mosaic from './Components/Mosaic/Mosaic';
 import FileUpload from './Components/FileUpload/FileUpload';
 import './App.css';
+import { StateProvider } from './state';
 
-class App extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      selectedImage: null,
-      mosaicTiles: [],
-    };
-  }
+function App(/* props */) {
+  const reducer = (state, action) => {
+    switch (action.type) {
+      case 'SELECT_IMAGE':
+        return {
+          image: action.image,
+        };
 
-  handleSelectImage = image => {
-    this.setState({ selectedImage: image });
+      default:
+        return state;
+    }
   };
 
-  render() {
-    const { selectedImage, mosaicTiles } = this.state;
-    return (
-      <LocaleProvider locale={enUS}>
+  return (
+    <ConfigProvider locale={enUS}>
+      <StateProvider initialState={{ image: null }} reducer={reducer}>
         <div className="App">
           <div>
-            <Gallery
-              selectImage={this.handleSelectImage}
-              subreddit="earthporn"
-            />
+            <Gallery subreddit="earthporn" />
           </div>
           <div>
-            <FileUpload selectImage={this.handleSelectImage} />
+            <FileUpload />
           </div>
           <div>
-            {
-              <Mosaic
-                img={selectedImage}
-                width={1000}
-                height={600}
-                tileSize={10}
-                mosaicTiles={mosaicTiles}
-              />
-            }
+            <Mosaic width={1000} height={600} tileSize={10} />
           </div>
         </div>
-      </LocaleProvider>
-    );
-  }
+      </StateProvider>
+    </ConfigProvider>
+  );
 }
 
 export default App;

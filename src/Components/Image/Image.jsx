@@ -1,24 +1,10 @@
-import * as React from 'react';
+import React from 'react';
 import propTypes from 'prop-types';
 
-import Spin from '../antd/Spin';
+import { useStateValue } from '../../state';
 import noop from '../../utils/noop';
-
-const imageReducer = (state, { type }) => {
-  switch (type) {
-    case 'IMAGE_SUCCESS':
-      return { loading: false, errorMessage: '' };
-    case 'IMAGE_TIMEOUT':
-      return { loading: false, errorMessage: "Image timed out ='(" };
-    case 'IMAGE_ERROR':
-      return {
-        loading: false,
-        errorMessage: 'Oops, we were not able to load this image.',
-      };
-    default:
-      throw new Error();
-  }
-};
+import Spin from '../antd/Spin';
+import { imageReducer } from './imageReducer';
 
 function Image(props) {
   const [state, dispatch] = React.useReducer(imageReducer, {
@@ -26,8 +12,15 @@ function Image(props) {
     errorMessage: '',
   });
 
+  const [, dispatchImage] = useStateValue();
+  const selectImage = image =>
+    dispatchImage({
+      type: 'SELECT_IMAGE',
+      image,
+    });
+
   const { loading, errorMessage } = state;
-  const { selectImage, autoSelect, src } = props;
+  const { autoSelect, src } = props;
   const domImage = React.useRef(null);
 
   // If image does not load within 20s, dispatch timeout.
