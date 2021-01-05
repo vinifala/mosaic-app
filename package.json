@@ -5,7 +5,7 @@
   "private": true,
   "dependencies": {
     "antd": "^3.26.6",
-    "axios": "^0.19.1",
+    "axios": "^0.21.1",
     "body-parser": "^1.19.0",
     "dotenv": "6.2.0",
     "express": "^4.17.1",
